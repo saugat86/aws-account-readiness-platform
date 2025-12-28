@@ -47,6 +47,13 @@ The AWS Account Readiness Platform uses intelligent scoring algorithms to evalua
 - Security best practices checklist
 - Unusual activity alerts
 
+### 🔥 **Real AWS Account Integration**
+- **Live AWS CLI analysis** of your existing account
+- **Automatic business profile generation** from AWS metadata
+- **Service usage assessment** (EC2, S3, IAM analysis)
+- **Security posture evaluation** (MFA, IAM users, permissions)
+- **Professional readiness reporting** with AWS-specific insights
+
 ## 🏗️ Architecture
 
 ```
@@ -103,21 +110,131 @@ npm run test:scoring
 npm run dev
 ```
 
-### AWS CLI Integration Testing
-```bash
-# Configure AWS CLI first
-aws configure
+### 🔥 AWS CLI Integration Testing (Real Account Analysis)
 
-# Run AWS CLI integration test
+The platform includes advanced AWS CLI integration that analyzes your **real AWS account** to provide accurate readiness assessments.
+
+#### Prerequisites for AWS CLI Testing
+```bash
+# 1. Install AWS CLI v2
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+
+# 2. Configure with your AWS credentials
+aws configure
+# Enter your AWS Access Key ID
+# Enter your AWS Secret Access Key  
+# Enter your default region (e.g., us-east-1)
+# Enter output format (json)
+
+# 3. Verify AWS CLI setup
+aws sts get-caller-identity
+```
+
+#### Run AWS CLI Integration Tests
+```bash
+# Option 1: Bash Script (Comprehensive Analysis)
 chmod +x test-with-aws-cli.sh
 ./test-with-aws-cli.sh
 
-# Or use Node.js AWS SDK test
+# Option 2: Node.js AWS SDK (Advanced Analysis)
 npm install aws-sdk axios
 node aws-integration-test.js
 ```
 
-### API Testing
+#### What AWS CLI Testing Provides
+
+**🔍 Real Account Analysis:**
+- Extracts your actual AWS Account ID, ARN, and user information
+- Analyzes account age, alias, and configuration
+- Checks MFA status and security settings
+- Evaluates IAM user setup and permissions
+
+**📊 Service Usage Assessment:**
+- Scans EC2 instances and their states
+- Counts S3 buckets and storage usage
+- Identifies active AWS services
+- Analyzes usage patterns for legitimacy indicators
+
+**🎯 Business Profile Generation:**
+```bash
+# Automatically creates realistic business profiles like:
+{
+  "businessProfile": {
+    "companyName": "AWS Business 123456789012",
+    "taxId": "12-1234567",
+    "website": "https://business-123456789012.com"
+  },
+  "awsMetadata": {
+    "accountId": "123456789012",
+    "mfaEnabled": true,
+    "iamUserCount": 3,
+    "ec2Instances": 2,
+    "s3Buckets": 5
+  }
+}
+```
+
+**📈 Professional Reporting:**
+```
+📋 AWS ACCOUNT READINESS REPORT
+===============================================
+🏢 AWS Account Information:
+   Account ID: 123456789012
+   Account Alias: my-company
+   MFA Enabled: Yes ✅
+   IAM Users: 3
+
+☁️  AWS Service Usage:
+   EC2 Instances: 2 (Active usage indicator)
+   S3 Buckets: 5 (Storage utilization)
+
+📊 Readiness Score Analysis:
+   Overall Score: 88%
+   Status: Good - Minor improvements recommended
+
+🎯 AWS-Specific Insights:
+   ✅ MFA enabled - Shows security consciousness
+   ✅ Multiple IAM users - Indicates business usage
+   ✅ Active service usage - Demonstrates legitimate activity
+```
+
+#### Sample AWS CLI Test Output
+```bash
+🚀 AWS Account Readiness Platform - CLI Testing
+==============================================
+
+🔍 Step 1: Verifying AWS CLI Configuration
+✅ AWS CLI configured successfully
+   Account ID: 123456789012
+   User ARN: arn:aws:iam::123456789012:user/business-user
+   Default Region: us-east-1
+
+🔍 Step 2: Gathering AWS Account Information
+📊 Account Summary: [Account details table]
+
+🧮 Step 4: Calculating Readiness Score
+✅ Readiness Score Calculated
+📊 Overall Readiness Score: 88%
+🎉 Good! Minor improvements recommended.
+
+🔍 Step 5: Risk Factor Analysis
+✅ Risk Analysis Completed
+📊 Risk Factors Found: 1
+⚠️  Review and address identified risk factors
+
+🎯 Step 6: AWS-Specific Recommendations
+✅ MFA is enabled - Good security practice
+✅ Multiple IAM users - Indicates business usage
+✅ EC2 instances found - Active compute usage
+✅ S3 buckets found - Active storage usage
+
+🎉 Step 7: Testing Complete
+✅ AWS CLI integration test completed successfully!
+```
+
+### API Testing (Alternative Method)
 ```bash
 # Test scoring endpoint
 curl -X POST http://localhost:3001/api/scoring/calculate \
@@ -184,17 +301,30 @@ JWT_SECRET=your-jwt-secret
 DATABASE_URL=postgresql://localhost:5432/aws_readiness
 ```
 
-### AWS CLI Configuration
+### AWS CLI Configuration for Real Account Testing
 ```bash
-# Configure AWS credentials for testing
+# Configure AWS credentials for real account analysis
 aws configure
+
+# Required permissions for comprehensive testing:
+# - sts:GetCallerIdentity (Account information)
+# - iam:GetAccountSummary (Account details)
+# - iam:ListAccountAliases (Account alias)
+# - iam:ListMFADevices (Security assessment)
+# - iam:ListUsers (Business usage indicators)
+# - ec2:DescribeInstances (Service usage analysis)
+# - s3:ListBuckets (Storage utilization check)
+
+# Test your AWS CLI setup
+aws sts get-caller-identity
 ```
 
 ## 📚 Documentation
 
-- **[Testing Guide](TESTING.md)** - Comprehensive testing instructions
+- **[Testing Guide](TESTING.md)** - Comprehensive testing instructions including AWS CLI integration
 - **[Scoring Mechanism](SCORING_MECHANISM.md)** - Detailed scoring algorithm explanation
 - **[AWS Guidelines](AWS_ACCOUNT_GUIDELINES.md)** - Best practices for AWS account creation
+- **[AWS CLI Testing](aws-cli-testing.md)** - Real AWS account analysis and testing
 - **[API Documentation](docs/api.md)** - REST API reference
 
 ## 🤝 Contributing
