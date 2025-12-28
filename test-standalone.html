@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Account Readiness - Standalone Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <header class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-6">
+                    <h1 class="text-3xl font-bold text-gray-900">
+                        AWS Account Readiness Platform - Test
+                    </h1>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 py-6 sm:px-0">
+                <div id="readiness-score" class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-2xl font-bold mb-4">AWS Account Readiness Score</h2>
+                    <div id="score-content">Loading...</div>
+                </div>
+
+                <div class="mt-6 bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-xl font-bold mb-4">Test Business Profile</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Company Name</label>
+                            <input type="text" id="companyName" value="Test Company LLC" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Business Type</label>
+                            <select id="businessType" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                                <option value="llc">LLC</option>
+                                <option value="corporation">Corporation</option>
+                                <option value="partnership">Partnership</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Tax ID</label>
+                            <input type="text" id="taxId" value="12-3456789" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Website</label>
+                            <input type="text" id="website" value="https://testcompany.com" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" id="email" value="admin@testcompany.com" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Payment Method</label>
+                            <select id="paymentMethod" class="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2">
+                                <option value="business_credit">Business Credit Card</option>
+                                <option value="business_debit">Business Debit Card</option>
+                                <option value="prepaid">Prepaid Card</option>
+                                <option value="personal">Personal Card</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button onclick="calculateScore()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                        Calculate Readiness Score
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Standalone scoring logic
+        function calculateReadinessScore(businessProfile, contactInfo, paymentMethod) {
+            let businessScore = 0;
+            let contactScore = 0;
+            let paymentScore = 0;
+            let riskScore = 1.0;
+
+            // Business profile scoring (0-1)
+            if (businessProfile.companyName) businessScore += 0.25;
+            if (businessProfile.businessType) businessScore += 0.25;
+            if (businessProfile.taxId) businessScore += 0.25;
+            if (businessProfile.website) businessScore += 0.25;
+
+            // Contact info scoring (0-1)
+            if (contactInfo.email) contactScore += 0.5;
+            if (contactInfo.email && !isFreeDomain(contactInfo.email)) contactScore += 0.5;
+
+            // Payment method scoring (0-1)
+            switch (paymentMethod.type) {
+                case 'business_credit': paymentScore = 1.0; break;
+                case 'business_debit': paymentScore = 0.8; break;
+                case 'personal': paymentScore = 0.4; break;
+                case 'prepaid': paymentScore = 0.2; riskScore -= 0.3; break;
+            }
+
+            // Risk factors
+            if (contactInfo.email && isFreeDomain(contactInfo.email)) {
+                riskScore -= 0.2;
+            }
+
+            riskScore = Math.max(0, riskScore);
+
+            const overall = (businessScore * 0.3 + contactScore * 0.2 + paymentScore * 0.3 + riskScore * 0.2);
+
+            return {
+                overall,
+                categories: {
+                    businessProfile: businessScore,
+                    contactInfo: contactScore,
+                    paymentMethod: paymentScore,
+                    riskFactors: riskScore,
+                    documentation: 0.5 // Mock value
+                },
+                recommendations: generateRecommendations(businessScore, contactScore, paymentScore, riskScore)
+            };
+        }
+
+        function isFreeDomain(email) {
+            const freeDomains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'];
+            const domain = email.split('@')[1]?.toLowerCase();
+            return freeDomains.includes(domain);
+        }
+
+        function generateRecommendations(businessScore, contactScore, paymentScore, riskScore) {
+            const recommendations = [];
+            
+            if (businessScore < 0.8) {
+                recommendations.push('Complete all business profile fields');
+            }
+            if (contactScore < 0.8) {
+                recommendations.push('Use a professional business email address');
+            }
+            if (paymentScore < 0.7) {
+                recommendations.push('Use a business credit card for better verification');
+            }
+            if (riskScore < 0.8) {
+                recommendations.push('Address identified risk factors');
+            }
+
+            return recommendations;
+        }
+
+        function getScoreColor(value) {
+            if (value >= 0.8) return 'text-green-600';
+            if (value >= 0.6) return 'text-yellow-600';
+            return 'text-red-600';
+        }
+
+        function getScoreBarColor(value) {
+            if (value >= 0.8) return 'bg-green-500';
+            if (value >= 0.6) return 'bg-yellow-500';
+            return 'bg-red-500';
+        }
+
+        function calculateScore() {
+            const businessProfile = {
+                companyName: document.getElementById('companyName').value,
+                businessType: document.getElementById('businessType').value,
+                taxId: document.getElementById('taxId').value,
+                website: document.getElementById('website').value
+            };
+
+            const contactInfo = {
+                email: document.getElementById('email').value
+            };
+
+            const paymentMethod = {
+                type: document.getElementById('paymentMethod').value
+            };
+
+            const score = calculateReadinessScore(businessProfile, contactInfo, paymentMethod);
+            displayScore(score);
+        }
+
+        function displayScore(score) {
+            const content = document.getElementById('score-content');
+            
+            content.innerHTML = `
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-lg font-medium">Overall Score</span>
+                        <span class="${getScoreColor(score.overall)} text-2xl font-bold">
+                            ${Math.round(score.overall * 100)}%
+                        </span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div class="${getScoreBarColor(score.overall)} h-3 rounded-full" 
+                             style="width: ${score.overall * 100}%"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    ${Object.entries(score.categories).map(([category, value]) => `
+                        <div class="border rounded-lg p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium capitalize">
+                                    ${category.replace(/([A-Z])/g, ' $1').trim()}
+                                </span>
+                                <span class="${getScoreColor(value)} font-bold">
+                                    ${Math.round(value * 100)}%
+                                </span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="${getScoreBarColor(value)} h-2 rounded-full" 
+                                     style="width: ${value * 100}%"></div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                ${score.recommendations.length > 0 ? `
+                    <div>
+                        <h3 class="text-lg font-semibold mb-3">Recommendations</h3>
+                        <ul class="space-y-2">
+                            ${score.recommendations.map(rec => `
+                                <li class="flex items-start">
+                                    <span class="text-blue-500 mr-2">•</span>
+                                    <span class="text-gray-700">${rec}</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        // Calculate initial score on page load
+        window.onload = function() {
+            calculateScore();
+        };
+    </script>
+</body>
+</html>

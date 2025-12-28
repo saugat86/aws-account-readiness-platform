@@ -1,0 +1,17 @@
+{
+  "name": "aws-readiness-cli-test",
+  "version": "1.0.0",
+  "description": "AWS CLI integration testing for Account Readiness Platform",
+  "scripts": {
+    "test:aws-cli": "chmod +x test-with-aws-cli.sh && ./test-with-aws-cli.sh",
+    "test:aws-sdk": "node aws-integration-test.js",
+    "setup:aws-test": "npm install aws-sdk axios bc"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1490.0",
+    "axios": "^1.6.2"
+  },
+  "devDependencies": {
+    "bc": "^1.0.0"
+  }
+}
