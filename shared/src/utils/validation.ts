@@ -46,9 +46,10 @@ export const validatePhone = (phone: string): boolean => {
   const cleaned = phone.replace(/[\s\-\(\)\.]/g, '');
 
   // Support international format (+country code) and US format
-  const phoneRegex = /^(\+\d{1,3}[- ]?)?\d{10,14}$/;
+  // After cleaning, we just need digits with optional + at start
+  const phoneRegex = /^\+?\d{10,15}$/;
 
-  return phoneRegex.test(cleaned) && cleaned.length >= 10 && cleaned.length <= 15;
+  return phoneRegex.test(cleaned);
 };
 
 /**
